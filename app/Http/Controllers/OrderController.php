@@ -41,7 +41,12 @@ class OrderController extends Controller
         return $this->authenticate()->http($request, function ($request, $cred) {
             return Excel::download(new TransactionExport(
                 $this->getMerchantTransactions($cred)
-                    ->makeHidden(['product_meta', 'delivery_info', 'consumer_user_id', 'provider_user_id', 'merchant_id', 'order_detail_id', 'order_total', 'order_qty', 'service_id', 'payment_id', 'prod_id', 'date_confirmed', 'created_at', 'updated_at'])
+                    //             ->make(['product_meta', 'delivery_info', 'consumer_user_id', 'provider_user_id', 'merchant_id', 'order_detail_id', 'order_total', 'order_qty', 'service_id', 'payment_id', 'prod_id', 'date_confirmed', 'created_at', 'updated_at'])
+                    //     ), 'Transactions' . date("-Y-m-d h:i:s") . '.xlsx');
+                    // });
+
+                    //transaction error fix formatting of tables
+                    ->make(['order_id', 'delivery_info', 'consumer_user_id', 'provider_user_id', 'merchant_id', 'order_detail_id', 'order_total', 'order_qty', 'service_id', 'payment_id', 'prod_id', 'date_confirmed', 'created_at', 'updated_at'])
             ), 'Transactions' . date("-Y-m-d h:i:s") . '.xlsx');
         });
     }
