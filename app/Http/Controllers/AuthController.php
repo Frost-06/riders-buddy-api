@@ -93,32 +93,37 @@ class AuthController extends Controller
                 if ($user->default_address) {
                     $user->default_address = $user->default_address[0];
                 }
-                $user->user_type = DB::select("select * from user_types where user_type_id = ?", [$user->user_type])[0];
+                $user->user_type = DB::select("select * from user_types where user_type_id = ?", [$user->user_type]);
                 if (!password_verify($request->user_password, $user['user_password'])) {
                     return response()->json([
                         "message" => "Incorrect Password, Please try again",
                         "status" => false,
                     ]);
                 } else {
-                    $mesage = '';
+                    $mesage = "";
+                    $user_status = "";
                     if ($user['user_status'] == 'Unverified') {
                         $message = "Please verify your account!";
-                    } elseif ($user['user_status'] == 'Suspended') {
+                        $user_status = "Unverified";
+                    } else if ($user['user_status'] == 'Suspended') {
                         $message = "You're account is suspended!";
-                    } elseif ($user['user_status'] == 'Banned') {
+                        $user_status = "Suspended";
+                    } else if ($user['user_status'] == 'Banned') {
                         $message = "You're account is banned!";
+                        $user_status = "Banned";
                     } else {
                         $token = $this->generateAuthToken($user['user_id'], $user['user_email']);
                         $user['user_token'] = $token;
                         return response()->json($user);
                     }
-                    $fake_token = ($user['user_token'] * 1234);
-                    $user->user_token = $fake_token;
+                    $fake_token = (openssl_random_pseudo_bytes(64));
+                    $user->user_token = bin2hex($fake_token);
                     return response()->json([
                         "message" => $message,
                         "status" => false,
-                        "error" => "UNVERIFIED",
-                        "user_token" => $fake_token,
+                        "user_status" => $user_status,
+                        // "error" => "UNVERIFIED",
+                        "user_token" => bin2hex($fake_token),
                         "user" => $user,
                     ]);
                 }
