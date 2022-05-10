@@ -22,7 +22,6 @@ class MerchantController extends Controller
             $merchant->vendor = Api::wp("wcfmmp/v1")->get("store-vendors/" . $merch_id);
             return response()->json($merchant);
         }
-
     }
     public function category_exists($categories, $category)
     {
@@ -30,7 +29,6 @@ class MerchantController extends Controller
             if ($c->id == $category->id) {
                 return true;
             }
-
         }
         return false;
     }
@@ -57,30 +55,54 @@ class MerchantController extends Controller
             ]);
         }
     }
-    public function injectMerchantModel($products){
+    public function injectMerchantModel($products)
+    {
         $stores = [];
         $flatten_stores = [];
-        foreach($products as $s){
-            array_push($stores,$s->store->vendor_id);
+        foreach ($products as $s) {
+            array_push($stores, $s->store->vendor_id);
         }
         $stores = array_unique($stores);
-        foreach($stores as $store){
-            array_push($flatten_stores,$store);
+        foreach ($stores as $store) {
+            array_push($flatten_stores, $store);
         }
         $merchant = [];
-        $merchants = Merchant::whereIn("merch_wp_id",$flatten_stores)->get();
-        foreach($merchants as $m){
+        $merchants = Merchant::whereIn("merch_wp_id", $flatten_stores)->get();
+        foreach ($merchants as $m) {
             $merchant[$m->merch_wp_id] = $m;
         }
-        foreach($products as $s){
+        foreach ($products as $s) {
             $s->merchant = $merchant[$s->store->vendor_id];
         }
         return $products;
     }
+
     public function productArchive(Request $request)
     {
         $return = Api::wp("wc/v3")->get("products", $request->all());
         return $this->injectMerchantModel($return);
     }
 
+    public function merchantArchive(Request $request)
+    {
+        $return = Api::wp("wcfmmp/v1")->get("store-vendors", $request->all());
+        return response()->json($return);
+    }
+
+    public function merchantInsert(Request $request)
+    {
+        $url = "http://localhost:3002/wp-json/mo/v1/store-location";
+        $merchants = Api::wp("wcfmmp/v1")->get("store-vendors");
+
+        return response()->json([
+            "merchant" => $merchants,
+        ]);
+
+        /*
+            Update vendor data to merchant table - in laravel check first if merchant exist through merch_name
+            call api http://localhost:3002/wp-json/mo/v1/store-location
+            to insert meta_key _wcfm_store_lng and _wcfm_store_lat to merch_lat and merch_long
+
+        */
+    }
 }
