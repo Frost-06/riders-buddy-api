@@ -29,6 +29,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::post("/register", [AuthController::class, "register"]);
 Route::post("/login", [AuthController::class, "login"]);
+Route::post("/logout", [AuthController::class, "logout"]);
 Route::post("/verify-otp", [AuthController::class, "verifyOTP"]);
 Route::post("/resend-otp", [AuthController::class, "resendOTP"]);
 Route::post("/hook/otp", [Hook::class, "otp"]);
@@ -45,6 +46,7 @@ Route::get("/merchants/{merch_id?}", [MerchantController::class, "all"]);
 Route::get("/merchants/{merch_id?}/data", [MerchantController::class, "products"]);
 Route::get('/products', [MerchantController::class, "productArchive"]);
 Route::post('/products', [MerchantController::class, "productArchive"]);
+Route::get('/stores', [MerchantController::class, "merchantArchive"]);
 
 Route::get("/cart", [CartController::class, "getCart"]);
 Route::post("/cart", [CartController::class, "setCart"]);
