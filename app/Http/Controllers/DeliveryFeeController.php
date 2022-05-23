@@ -35,7 +35,6 @@ class DeliveryFeeController extends Controller
 
     public function getFee(Request $request)
     {
-
         return $this->authenticate()->http($request, function ($request, $cred) {
             $date = date("Y-m-d");
             $now = DeliveryFee::whereRaw("date_from <= '$date' and date_to >= '$date'")->get()->filter(function ($value, $key) {

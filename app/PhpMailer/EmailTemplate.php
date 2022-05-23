@@ -55,7 +55,8 @@ class EmailTemplate extends SMTPCon
             foreach ($order_detail as $detail) {
                 $order_table .= "<tr>";
                 $product = json_decode($detail['product_meta']);
-                $order_table .= "<td style=\"padding: 10px\"><img src=\"{$product->images[0]->src}\" width=\"200\"/></td>";
+                if (isset($product->images[0]->src))
+                    $order_table .= "<td style=\"padding: 10px\"><img src=\"{$product->images[0]->src}\" width=\"200\"/></td>";
                 $order_table .= "<td style=\"padding: 10px\">{$product->name}</td>";
                 $order_table .= "<td style=\"padding: 10px\">{$detail['order_qty']}</td>";
                 $order_table .= "<td style=\"padding: 10px\">Php {$product->price}</td>";

@@ -75,3 +75,6 @@ Route::delete("/user", [UserController::class, "deleteUser"]);
 Route::post("/user", [UserController::class, "updateUser"]);
 
 Route::post("/notifications", [Hook::class, "update_notifications"]);
+
+Route::post("/rate/merchant", [MerchantController::class, "rateMerchant"]);
+Route::get("/ratings", [MerchantController::class, "getRatings"]);

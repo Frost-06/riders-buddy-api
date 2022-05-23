@@ -41,6 +41,7 @@ class SMTPCon
                 return [
                     "status" => false,
                     "message" => "Unable to send message",
+                    "error" => $this->mailer->ErrorInfo,
                 ];
             }
         }

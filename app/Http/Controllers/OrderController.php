@@ -63,6 +63,9 @@ class OrderController extends Controller
         if ($validation->fails()) {
             return $validation->messages();
         }
+        if ($request->reservation_date) {
+            $request->reservation_date = date("Y-m-d H:i:s", strtotime($request->reservation_date));
+        }
         return $this->authenticate()->http($request, function ($request, $cred) {
             $order = Order::create(array_merge($request->all(), ["status_text" => OrderController::makeStatusText("created")]));
             $order = Order::where("order_id", "=", $order->id)->get()->first();
@@ -138,14 +141,12 @@ class OrderController extends Controller
                 $order = Order::where("order_id", "=", $request->order_id);
                 $o1 = clone $order;
                 $o1 = $o1->get()->first();
-                if ($order->get()->first()->provider_user_id) {
-                    if ($cred->user_type->name != "admin") {
-                        if ($o1->status != "pending" && $o1->provider_user_id != $cred->user_id) {
-                            return [
-                                "error" => true,
-                                "message" => "[Unauthorized access] Order is already accepted by other user."
-                            ];
-                        }
+                if ($cred->user_type->name != "admin" && $cred->user_type->name != "merchant") {
+                    if ($o1->status != "pending" && $o1->provider_user_id != $cred->user_id) {
+                        return [
+                            "error" => true,
+                            "message" => "[Unauthorized access] Order is already accepted by other user."
+                        ];
                     }
                 }
                 if ($o1->status != "pending" && $o1->provider_user_id != null) {
